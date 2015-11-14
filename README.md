@@ -2,11 +2,11 @@
 
 Make Vim **read text** out loud!
 
-(Works on OSX only)
+(Works on Linux only)
 
 ### About
 
-This plugin uses the `say` OSX command and makes it nice to use from Vim.
+This plugin uses the `mpv` player and GoogleTTS to convert text to voice, makes it nice to use from Vim.
 
 Features:
 
