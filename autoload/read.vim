@@ -49,20 +49,66 @@ endfunction
 " read#filterop() {{{1
 
 function! read#filterop(type) abort
-  if !executable(g:read_cmd)
-    echohl ErrorMSG | echo g:read_cmd.' executable not found!' | echohl NONE
+    let execCmd = split(g:read_cmd)[0]
+  if !executable(execCmd)
+    echohl ErrorMSG | echo execCmd.' executable not found!' | echohl NONE
     return
   endif
   try
-    let expr = s:opfunc(a:type)
-
     let command = g:read_cmd
-    if exists('g:read_voice')
-      let command .= ' -v '.g:read_voice
-    endif
+    
+    " replace language with system language
+    let command = substitute(command, "%{language}", g:read_language, "")
+
+    " let expr = s:get_visual_selection()
+    let expr = substitute(s:opfunc(a:type), "\n", " ", "g")
+
+    " replace ~, !, @, #, $, %, &, *, (, ), -, _, +, =, {, }, [, ], ?, /
+    let expr = substitute(expr , "\\~" , g:read_tilde_text           , "g")
+    let expr = substitute(expr , "!"   , g:read_bang_text            , "g")
+    let expr = substitute(expr , "@"   , g:read_at_text              , "g")
+    let expr = substitute(expr , "#"   , g:read_crunch_text          , "g")
+    let expr = substitute(expr , "\\$" , g:read_dollar_text          , "g")
+    let expr = substitute(expr , "%"   , g:read_percent_text         , "g")
+    let expr = substitute(expr , "&"   , g:read_ampersand_text       , "g")
+    let expr = substitute(expr , "*"   , g:read_star_text            , "g")
+
+    let expr = substitute(expr , "-"   , g:read_minus_text           , "g")
+    let expr = substitute(expr , "_"   , g:read_underscore_text      , "g")
+    let expr = substitute(expr , "="   , g:read_equals_text          , "g")
+    let expr = substitute(expr , "+"   , g:read_plus_text            , "g")
+
+    let expr = substitute(expr , "?"   , g:read_question_text        , "g")
+    let expr = substitute(expr , "\""  , g:read_quote_text           , "g")
+    let expr = substitute(expr , "'"  , g:read_smallQuote_text      , "g")
+    let expr = substitute(expr , "?"   , g:read_question_text        , "g")
+    let expr = substitute(expr , "/"   , g:read_slash_text           , "g")
+    let expr = substitute(expr , "\\." , g:read_dot_text             , "g")
+    let expr = substitute(expr , "|"   , g:read_pipe_text            , "g")
+
+    " braces too much?
+    let expr = substitute(expr , "("   , g:read_opening_bracket_text , "g")
+    let expr = substitute(expr , ")"   , g:read_closing_bracket_text , "g")
+    let expr = substitute(expr , "{"   , g:read_opening_curl_text    , "g")
+    let expr = substitute(expr , "}"   , g:read_closing_curl_text    , "g")
+    let expr = substitute(expr , "["   , g:read_opening_brace_text   , "g")
+    let expr = substitute(expr , "]"   , g:read_closing_brace_text   , "g")
+    let expr = substitute(expr , ";"   , g:read_semicolon_text       , "g")
+    let expr = substitute(expr , ":"   , g:read_colon_text           , "g")
+    
+    " echo expr
+    " return
+    
+    "replace spaces with %20
+    let expr = substitute(expr , " ", "%20", "g")
+    
+
+    " replace text
+    let command = substitute(command, '%{text}', shellescape(expr), "")
 
     call read#stop()
-    let pid = system(command.' "'.shellescape(expr).'" & echo $!')
+
+    let pid = system(command)
     let s:pid = substitute(pid, "\n", "", "")
   catch /^.*/
     echohl ErrorMSG | echo v:errmsg | echohl NONE
@@ -70,4 +116,16 @@ function! read#filterop(type) abort
 endfunction
 
 " }}}
+
+" good stuff from xolox (http://stackoverflow.com/questions/1533565/how-to-get-visually-selected-text-in-vimscript)
+" function! s:get_visual_selection()
+"   " Why is this not a built-in Vim script function?!
+"   let [lnum1, col1] = getpos("'<")[1:2]
+"   let [lnum2, col2] = getpos("'>")[1:2]
+"   let lines = getline(lnum1, lnum2)
+"   let lines[-1] = lines[-1][: col2 - (&selection == 'inclusive' ? 1 : 2)]
+"   let lines[0] = lines[0][col1 - 1:]
+"   return join(lines, " ")
+" endfunction
+
 " vim:set ft=vim et sw=2:
