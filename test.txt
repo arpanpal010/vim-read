@@ -18,3 +18,20 @@ works well for some organisms (e.g., birds) will be useless for others (e.g.,
 bacteria) particularly due to concerns regarding if the species reproduces
 asexually or sexually. The scientific study of the species problem has been
 called microtaxonomy.
+
+
+symbols
+---
+
+~ ! @ # $ % ^ & * ( ) { } [ ] - _ = +
+
+example code
+---
+
+$http.get("", { })
+.success(function(data) {
+	console.log(data);
+})
+.error(function(data){
+	console.log(data);
+})
